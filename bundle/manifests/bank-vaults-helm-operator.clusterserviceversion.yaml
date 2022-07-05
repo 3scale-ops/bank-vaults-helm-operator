@@ -78,7 +78,7 @@ metadata:
     operators.operatorframework.io/project_layout: helm.sdk.operatorframework.io/v1
     repository: https://github.com/3scale-ops/bank-vaults-helm-operator
     support: Red Hat
-  name: bank-vaults-helm-operator.v1.15.3-alpha.1
+  name: bank-vaults-helm-operator.v1.15.3
   namespace: placeholder
 spec:
   apiservicedefinitions: {}
@@ -442,7 +442,7 @@ spec:
                 - --metrics-bind-address=127.0.0.1:8080
                 - --leader-elect
                 - --leader-election-id=bank-vaults-helm-operator
-                image: quay.io/3scale/bank-vaults-helm-operator:v1.15.3-alpha.1
+                image: quay.io/3scale/bank-vaults-helm-operator:v1.15.3
                 livenessProbe:
                   httpGet:
                     path: /healthz
@@ -529,4 +529,4 @@ spec:
   provider:
     name: Red Hat
     url: https://www.redhat.com
-  version: 1.15.3-alpha.1
+  version: 1.15.3
