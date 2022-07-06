@@ -78,7 +78,7 @@ metadata:
     operators.operatorframework.io/project_layout: helm.sdk.operatorframework.io/v1
     repository: https://github.com/3scale-ops/bank-vaults-helm-operator
     support: Red Hat
-  name: bank-vaults-helm-operator.v1.15.3
+  name: bank-vaults-helm-operator.v1.15.4
   namespace: placeholder
 spec:
   apiservicedefinitions: {}
@@ -390,18 +390,6 @@ spec:
           - deployments
           verbs:
           - '*'
-        - apiGroups:
-          - authentication.k8s.io
-          resources:
-          - tokenreviews
-          verbs:
-          - create
-        - apiGroups:
-          - authorization.k8s.io
-          resources:
-          - subjectaccessreviews
-          verbs:
-          - create
         serviceAccountName: bank-vaults-helm-operator-controller-manager
       deployments:
       - name: bank-vaults-helm-operator-controller-manager
@@ -420,29 +408,16 @@ spec:
             spec:
               containers:
               - args:
-                - --secure-listen-address=0.0.0.0:8443
-                - --upstream=http://127.0.0.1:8080/
-                - --logtostderr=true
-                - --v=0
-                image: gcr.io/kubebuilder/kube-rbac-proxy:v0.8.0
-                name: kube-rbac-proxy
-                ports:
-                - containerPort: 8443
-                  name: https
-                  protocol: TCP
-                resources:
-                  limits:
-                    cpu: 500m
-                    memory: 128Mi
-                  requests:
-                    cpu: 5m
-                    memory: 64Mi
-              - args:
                 - --health-probe-bind-address=:8081
-                - --metrics-bind-address=127.0.0.1:8080
+                - --metrics-bind-address=:8080
                 - --leader-elect
                 - --leader-election-id=bank-vaults-helm-operator
-                image: quay.io/3scale/bank-vaults-helm-operator:v1.15.3
+                env:
+                - name: WATCH_NAMESPACE
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.annotations['olm.targetNamespaces']
+                image: quay.io/3scale/bank-vaults-helm-operator:v1.15.4
                 livenessProbe:
                   httpGet:
                     path: /healthz
@@ -450,6 +425,9 @@ spec:
                   initialDelaySeconds: 15
                   periodSeconds: 20
                 name: manager
+                ports:
+                - containerPort: 8080
+                  name: metrics
                 readinessProbe:
                   httpGet:
                     path: /readyz
@@ -529,4 +507,4 @@ spec:
   provider:
     name: Red Hat
     url: https://www.redhat.com
-  version: 1.15.3
+  version: 1.15.4
