@@ -43,7 +43,7 @@ If you want to install a specific version of the operator **manually** via OLM
 * Deploy with `operator-sdk` using the following command:
 
 ```bash
-operator-sdk run bundle quay.io/3scale/bank-vaults-helm-operator:vv1.15.6
+operator-sdk run bundle quay.io/3scale/bank-vaults-helm-operator:v1.15.6
 ```
 
 * Then create any [OperatorConfig resource type](../config/samples/operator_v1alpha1_operatorconfig.yaml):
@@ -69,7 +69,7 @@ spec:
 * If you want to test an operator upgrade of a newer version, execute for example:
 
 ```bash
-operator-sdk run bundle-upgrade quay.io/3scale/bank-vaults-helm-operator:v1.7.3
+operator-sdk run bundle-upgrade quay.io/3scale/bank-vaults-helm-operator:v1.15.6
 ```
 
 ## OLM automatic deploy
@@ -114,10 +114,6 @@ you confirmation to install an operator upgrade):
 apiVersion: operators.coreos.com/v1alpha1
 kind: Subscription
 metadata:
-  annotations:
-    hive.openshift.io/managed-by-cluster: pro-base-ocp4
-    hive.openshift.io/managed-by-namespace: hive
-    hive.openshift.io/managed-by-syncset: pro-base-ocp4-bank-vaults-helm-operator
   name: bank-vaults-helm-operator
   namespace: vault
 spec:
@@ -134,10 +130,6 @@ spec:
 apiVersion: operator.vault.banzaicloud.com/v1alpha1
 kind: OperatorConfig
 metadata:
-  annotations:
-    hive.openshift.io/managed-by-cluster: pro-base-ocp4
-    hive.openshift.io/managed-by-namespace: hive
-    hive.openshift.io/managed-by-syncset: pro-base-ocp4-bank-vaults-helm-operator
   name: vault
   namespace: vault
 spec:

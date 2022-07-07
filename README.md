@@ -46,18 +46,18 @@ So the operator will create all helm chart resources, using the custom resource 
 
 ## Quick release
 
-You can easily generate the operator for any particular version of the Cert
-Manager Helm Chart using the `container-build` target with a specific `VERSION`.
+You can easily generate the operator for any particular version of the Bank-Vault
+Vault operator helm Chart using the `container-build` target with a specific `VERSION`.
 
 - Command
 
 ```bash
-VERSION=v1.15.6 make container-build
+VERSION=1.15.6 make container-build
 ```
 ```bash
 banzaicloud-stable/vault-operator@v1.15.6 downloaded to /home/rael/gh/3scale-ops/bank-vaults-helm-operator/helm-charts
 2022/07/06 13:20:32 resource bases/vault.banzaicloud.com_crds.yaml already in kustomization file
-docker build -t quay.io/3scale/bank-vaults-helm-operator:vv1.15.6 .
+docker build -t quay.io/3scale/bank-vaults-helm-operator:v1.15.6 .
 Sending build context to Docker daemon  253.4MB
 Step 1/5 : FROM quay.io/operator-framework/helm-operator:v1.20.0
  ---> 0612bfda4e55
@@ -75,7 +75,7 @@ Step 5/5 : WORKDIR ${HOME}
 Removing intermediate container aa0360f4d23e
  ---> d45c0dbfda24
 Successfully built d45c0dbfda24
-Successfully tagged quay.io/3scale/bank-vaults-helm-operator:vv1.15.6
+Successfully tagged quay.io/3scale/bank-vaults-helm-operator:v1.15.6
 ```
 
 - Files generated
