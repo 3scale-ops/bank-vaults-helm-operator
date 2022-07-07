@@ -8,7 +8,7 @@
 because it's used to download the [original helm chart](https://artifacthub.io/packages/helm/banzaicloud-stable/vault-operator)
 by the `download-helm-chart` makefile target.
 
-For **alpha** releases, the only the semver prefix is used to fetch the upstream chart release.
+For **alpha** releases, the only the part before the `-` is used to fetch the upstream chart release.
 
 ## Alpha
 
