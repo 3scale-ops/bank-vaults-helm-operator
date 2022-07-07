@@ -1,0 +1,6 @@
+# Use the 'create api' subcommand to add watches to this file.
+- group: operator.vault.banzaicloud.com
+  version: v1alpha1
+  kind: OperatorConfig
+  chart: helm-charts/vault-operator
+#+kubebuilder:scaffold:watch
