@@ -38,6 +38,6 @@ A real example of an alpha release can be found at [release: 1.15.6-alpha.1](htt
 ```bash
 make prepare-stable-release
 ```
-A real example of a stable release can be found at [release: 1.15.5](https://github.com/3scale-ops/bank-vaults-helm-operator/pull/1/commits/4411f1ad6b6b00dc2ac5fe9dc249a3a03ff1ef8e) commit.
+A real example of a stable release can be found at [release: 1.15.5](https://github.com/3scale-ops/bank-vaults-helm-operator/pull/1/commits/dfc83e767252559262c70ab7c74cdc3308c50a9b) commit.
 
 * Then open a [Pull Request](https://github.com/3scale-ops/bank-vaults-helm-operator/pulls), and a GitHub Action will automatically detect if it is new release or not, in order to create it by building/pushing new operator, bundle and catalog images, as well as creating a GitHub release draft.
