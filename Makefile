@@ -1,3 +1,9 @@
+# Fetch version from environment variable GITHUB_REF_NAME when running in GitHub Actions
+if [ -z ${GITHUB_REF_NAME} ];
+then
+	export VERSION=$(shell echo ${GITHUB_REF_NAME} | sed 's/v\?\([0-9.\+].*\)/\1/g);
+fi
+
 # VERSION defines the project version for the bundle.
 # Update this value when you upgrade the version of your project.
 # To re-generate a bundle for another specific version without changing the standard setup, you can:
@@ -30,7 +36,7 @@ BUNDLE_METADATA_OPTS ?= $(BUNDLE_CHANNELS) $(BUNDLE_DEFAULT_CHANNEL)
 # For example, running 'make bundle-build bundle-push catalog-build catalog-push' will build and push both
 # quay.io/3scale/bank-vaults-helm-operator-bundle:$VERSION and quay.io/3scale/bank-vaults-helm-operator-catalog:$VERSION.
 IMAGE_NAME_BASE ?= quay.io/3scale/bank-vaults-helm-operator
-IMAGE_TAG = $(VERSION)
+IMAGE_TAG = v$(VERSION)
 
 # BUNDLE_IMG defines the image:tag used for the bundle.
 # You can use it as an arg. (E.g make bundle-build BUNDLE_IMG=<some-registry>/<project-name-bundle>:<tag>)
