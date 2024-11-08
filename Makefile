@@ -3,7 +3,7 @@
 # To re-generate a bundle for another specific version without changing the standard setup, you can:
 # - use the VERSION as arg of the bundle target (e.g make bundle VERSION=0.0.2)
 # - use environment variables to overwrite this value (e.g export VERSION=0.0.2)
-VERSION ?= 1.15.8
+VERSION ?= 1.15.9-alpha.1
 
 # CHANNELS define the bundle channels used in the bundle.
 # Add a new line here if you would like to change its default config. (E.g CHANNELS = "candidate,fast,stable")
@@ -64,10 +64,14 @@ run: download-helm-chart helm-operator ## Run against the configured Kubernetes 
 CONTAINER_RUNTIME ?= docker
 
 container-build: download-helm-chart ## Build docker image with the manager.
-	$(CONTAINER_RUNTIME) build -t ${IMG} .
+	${CONTAINER_RUNTIME} manifest rm $(IMG) || echo "No manifest found"
+	${CONTAINER_RUNTIME} manifest create $(IMG)
+	${CONTAINER_RUNTIME} build \
+		--platform linux/arm64,linux/amd64 \
+		--manifest $(IMG) . -f Dockerfile
 
 container-push: ## Push docker image with the manager.
-	$(CONTAINER_RUNTIME) push ${IMG}
+	$(CONTAINER_RUNTIME) manifest push ${IMG}
 
 ##@ Deployment
 
@@ -128,7 +132,11 @@ bundle: operator-sdk kustomize helm-chart ## Generate bundle manifests and metad
 
 .PHONY: bundle-build
 bundle-build: ## Build the bundle image.
-	$(CONTAINER_RUNTIME) build -f bundle.Dockerfile -t $(BUNDLE_IMG) .
+	${CONTAINER_RUNTIME} manifest rm $(BUNDLE_IMG) || echo "No manifest found"
+	${CONTAINER_RUNTIME} manifest create $(BUNDLE_IMG)
+	${CONTAINER_RUNTIME} build \
+		--platform linux/arm64,linux/amd64 \
+		--manifest $(BUNDLE_IMG) . -f bundle.Dockerfile
 
 .PHONY: bundle-push
 bundle-push: ## Push the bundle image.
@@ -176,6 +184,13 @@ catalog-build: opm ## Build a catalog image.
 .PHONY: catalog-push
 catalog-push: ## Push a catalog image.
 	$(MAKE) container-push IMG=$(CATALOG_IMG)
+
+catalog-generate: opm ## Build a catalog image.
+	$(OPM) index add \
+		--generate  --out-dockerfile catalog.Dockerfile \
+		--container-tool $(CONTAINER_RUNTIME) \
+		--mode semver --tag $(CATALOG_IMG) \
+		--bundles $(BUNDLE_IMGS) $(FROM_INDEX_OPT)
 
 #############################################
 #### Custom Targets with extra binaries #####
