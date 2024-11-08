@@ -15,6 +15,9 @@ metadata:
     operators.operatorframework.io/project_layout: helm.sdk.operatorframework.io/v1
     repository: https://github.com/3scale-ops/bank-vaults-helm-operator
     support: Red Hat
+  labels:
+    operatorframework.io/arch.amd64: supported
+    operatorframework.io/arch.arm64: supported
   name: bank-vaults-helm-operator.v0.0.0
   namespace: placeholder
 spec:

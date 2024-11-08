@@ -2,8 +2,8 @@ name: release
 
 on:
   push:
-    branches:
-      - main
+    tags:
+      - "v*"
 
 jobs:
   build:
@@ -13,36 +13,93 @@ jobs:
 
       - uses: actions/cache@v2
         with:
-          path: ./bin
           key: ${{ runner.os }}-bin
+          path: ./bin
 
-      - name: Build image
-        run: make container-build
+      - id: meta
+        name: Docker meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            quay.io/3scale/bank-vaults-helm-operator
+          tags: |
+            type=semver,pattern={{raw}}
+
+      - id: meta-bundle
+        name: Docker meta for the bundle image
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            quay.io/3scale/bank-vaults-helm-operator-bundle
+          tags: |
+            type=semver,pattern={{raw}}
+
+      - id: meta-catalog
+        name: Docker meta for the catalog image
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            quay.io/3scale/bank-vaults-helm-operator-catalog
+          tags: |
+            type=semver,pattern={{raw}}
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
       - name: Export release name
         run: |
           echo "NEW_RELEASE=$(make get-new-release)" >> $GITHUB_ENV
+
       - name: Login to quay.io/3scale
-        if: ${{ env.NEW_RELEASE != '' }}
-        uses: docker/login-action@v1
+        uses: docker/login-action@v3
         with:
+          password: ${{ secrets.REGISTRY_PASSWORD }}
           registry: quay.io
           username: ${{ secrets.REGISTRY_USER }}
-          password: ${{ secrets.REGISTRY_PASSWORD }}
 
-      - name: Push new operator image
-        if: ${{ env.NEW_RELEASE != '' }}
-        run: make container-push
+      - name: Donwload helm chart
+        run: make download-helm-chart
 
-      - name: Publish new bundle image
-        if: ${{ env.NEW_RELEASE != '' }}
-        run: make bundle-publish
+      - name: Build and push operator
+        uses: docker/build-push-action@v6
+        with:
+          file: Dockerfile
+          labels: ${{ steps.meta.outputs.labels }}
+          platforms: linux/amd64,linux/arm64
+          provenance: false
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+
+      - name: Build and push bundle
+        uses: docker/build-push-action@v6
+        with:
+          file: bundle.Dockerfile
+          labels: ${{ steps.meta-bundle.outputs.labels }}
+          platforms: linux/amd64,linux/arm64
+          provenance: false
+          push: true
+          tags: ${{ steps.meta-bundle.outputs.tags }}
+
+      - name: Generate catalog Dockerfile
+        run: make catalog-generate
+
+      - name: Build and push catalog
+        uses: docker/build-push-action@v6
+        with:
+          file: catalog.Dockerfile
+          labels: ${{ steps.meta-catalog.outputs.labels }}
+          platforms: linux/amd64,linux/arm64
+          provenance: false
+          push: true
+          tags: ${{ steps.meta-catalog.outputs.tags }}
 
       - name: Create a new draft-release in github
-        if: ${{ env.NEW_RELEASE != '' }}
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "${{ env.NEW_RELEASE }}"
-          title: "${{ env.NEW_RELEASE }}"
+          automatic_release_tag: ${{ steps.meta.outputs.tags }}
           draft: true
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          title: ${{ steps.meta.outputs.tags }}
