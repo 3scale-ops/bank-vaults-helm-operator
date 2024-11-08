@@ -61,7 +61,7 @@ jobs:
           username: ${{ secrets.REGISTRY_USER }}
 
       - name: Donwload helm chart
-        run: make download-helm-chart
+        run: VERSION=${GITHUB_REF_NAME} make download-helm-chart
 
       - name: Build and push operator
         uses: docker/build-push-action@v6
@@ -84,7 +84,7 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
 
       - name: Generate catalog Dockerfile
-        run: make catalog-generate
+        run: VERSION=${GITHUB_REF_NAME} make catalog-generate
 
       - name: Build and push catalog
         uses: docker/build-push-action@v6
